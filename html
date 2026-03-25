@@ -4,40 +4,7 @@
 <meta charset="UTF-8">
 <title>Descubra a palavra Oculta</title>
 <link rel="stylesheet" href="style.css">
-<style>
 
-body{
-    font-family: ubuntu;
-    text-align:center;
-    color: black;
-}
-
-#forca{
-    margin-top:20px;
-}
-
-#palavra{
-    font-size:35px;
-    letter-spacing:10px;
-}
-
-#letrasErradas{
-    color:red;
-    font-size:25px;
-    font-weight:bold;
-}
-
-input{
-    padding:5px;
-    font-size:17px;
-}
-
-.button{
-    font-size:16px;
-    padding:5px 10px;
-    cursor:pointer;
-}
-</style>
 </head>
 
 <body>
@@ -56,7 +23,7 @@ input{
 <input type="text" id="letra" maxlength="1">
 <button class="button" onclick="tentarLetra()">Tentar</button>
 <button class="button" onclick="mostrarDica()">Mostrar Dica</button>
-
+<button class="button" onclick="reiniciarJogo()">Reiniciar</button>
 <script>
 const palavras = [
 "banana","morango","abacaxi","laranja","uva",
@@ -131,16 +98,53 @@ function tentarLetra(){
     document.getElementById("letrasErradas").innerText = letrasErradas.join(", ");
     document.getElementById("boneco").innerText = estagios[erros];
 
+
+function normalizar(texto){
+    return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
     if(!palavraOculta.includes("_")){
         alert("🎉 Você venceu!");
         location.reload();
     }
 
-    if(erros===6){
-        alert("💀 Você perdeu! Palavra: "+palavra);
-        location.reload();
+    if (erros >= estagios.length - 1) {
+    alert("💀 Você perdeu! Palavra: " + palavra);
+    location.reload();
+    }
+    if (palavraOculta.includes(letra) || letrasErradas.includes(letra)) {
+    return; // ignora letra repetida
     }
 }
+function reiniciarJogo(){
+    // sorteia nova palavra
+    indice = Math.floor(Math.random() * palavras.length);
+    palavra = palavras[indice];
+    dica = dicas[indice];
+
+    // reseta variáveis
+    palavraOculta = [];
+    letrasErradas = [];
+    erros = 0;
+
+    for(let i=0;i<palavra.length;i++){
+        palavraOculta.push("_");
+    }
+
+    // atualiza tela
+    document.getElementById("palavra").innerText = palavraOculta.join(" ");
+    document.getElementById("letrasErradas").innerText = "";
+    document.getElementById("boneco").innerText = estagios[0];
+
+    // esconde dica novamente
+    document.getElementById("dica").innerText = "";
+    document.getElementById("dica").style.display = "none";
+}
+document.getElementById("letra").addEventListener("keypress", function(e){
+    if(e.key === "Enter"){
+        tentarLetra();
+    }
+});
+
 </script>
 </body>
 </html>
